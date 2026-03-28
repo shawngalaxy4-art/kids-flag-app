@@ -2,7 +2,7 @@ name: Build APK
 
 on:
   push:
-    branches: [ "main" ] # This triggers whenever you update your code
+    branches: [ "main" ]
 
 jobs:
   build:
@@ -13,8 +13,8 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build with Buildozer
-        uses: ArtemSBulgakov/buildozer-action@v1
-        id: buildozer
+        # Using a version that handles permissions better
+        uses: action-pack/buildozer@v1
         with:
           command: buildozer android debug
           buildozer_version: stable
@@ -23,4 +23,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: package
-          path: ${{ steps.buildozer.outputs.filename }}
+          path: bin/*.apk
