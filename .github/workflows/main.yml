@@ -12,13 +12,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Build with Buildozer
-        # Using a version that handles permissions better
-        uses: action-pack/buildozer@v1
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          command: buildozer android debug
-          buildozer_version: stable
+          python-version: '3.11'
 
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libsqlite3-dev lld libffi-dev libssl-dev autoconf automake libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libgdbm-dev libdb5.3-dev libbz2-dev libexpat1-dev liblzma-dev libreadline-dev uuid-dev
+          pip install --upgrade pip
+          pip install buildozer cython==0.29.33 git+https://github.com/kivy/kivy.git@master
+
+      - name: Build with Buildozer
+        run: yes | buildozer android debug
+        
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
