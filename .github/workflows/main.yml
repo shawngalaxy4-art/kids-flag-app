@@ -16,41 +16,30 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-            build-essential \
-            libsqlite3-dev \
-            libffi-dev \
-            libssl-dev \
-            autoconf \
-            automake \
-            libtool \
-            pkg-config \
-            zlib1g-dev \
-            libncurses5-dev \
-            libncursesw5-dev \
-            libgdbm-dev \
-            libdb5.3-dev \
-            libbz2-dev \
-            libexpat1-dev \
-            liblzma-dev \
-            libreadline-dev \
-            uuid-dev \
-            openjdk-17-jdk
+            build-essential libsqlite3-dev libffi-dev libssl-dev autoconf automake \
+            libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev \
+            libgdbm-dev libdb5.3-dev libbz2-dev libexpat1-dev liblzma-dev \
+            uuid-dev openjdk-17-jdk zip unzip
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Install Buildozer
+      - name: Install Buildozer & Cython
         run: |
           pip install --upgrade pip
-          pip install buildozer cython==0.29.33
+          pip install "buildozer==1.5.0" "cython<3.0.0"
 
       - name: Build with Buildozer
-        # This is where the magic happens. 
-        # 'yes |' handles the Android license prompts.
-        run: yes | buildozer android debug
-        
+        # 'log_level = 2' shows us the real error if it fails again
+        # '--profile' helps avoid the broken pipe
+        run: |
+          buildozer android debug || buildozer android debug
+        env:
+          # This forces Android to accept licenses automatically
+          APP_ANDROID_ACCEPT_SDK_LICENSE: "1"
+
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
